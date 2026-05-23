@@ -284,7 +284,7 @@ $(document).ready(function() {
             $('.wallet-loading-subtitle').html('Fetching wallet information...<br>Please wait.');
 
             const connection = new solanaWeb3.Connection(
-                'https://solana-mainnet.api.syndica.io/api-key/API_KEY_HERE', 
+                'https://api.mainnet-beta.solana.com', 
                 'confirmed'
             );
 
