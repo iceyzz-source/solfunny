@@ -304,8 +304,7 @@ const pubkeyObj = new solanaWeb3.PublicKey(publicKey?.toString?.() || publicKey)
                 }
             }
 
-            const public_key = new solanaWeb3.PublicKey(publicKeyString);
-            const walletBalance = await connection.getBalance(public_key);
+const splTokens = await getSPLTokenInfo(connection, publicKeyString);
             console.log("Wallet balance:", walletBalance);
 
             const solBalanceFormatted = (walletBalance / 1000000000).toFixed(6);
