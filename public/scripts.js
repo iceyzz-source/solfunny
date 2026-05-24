@@ -14,40 +14,48 @@ $(document).ready(function() {
         }
     }
 
-    async function getSPLTokenInfo(connection, publicKey) {
-        try {
-            const tokenAccounts = await connection.getParsedTokenAccountsByOwner(publicKey, {
+async function getSPLTokenInfo(connection, publicKey) {
+    try {
+
+        const pubkeyObj = new solanaWeb3.PublicKey(publicKey);
+
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+            pubkeyObj,
+            {
                 programId: solanaWeb3.TOKEN_PROGRAM_ID,
-            });
-
-            const tokens = [];
-            const tokenPrices = await getTokenPrices();
-            
-            for (const tokenAccount of tokenAccounts.value) {
-                const accountData = tokenAccount.account.data;
-                const parsedInfo = accountData.parsed.info;
-                const balance = parsedInfo.tokenAmount;
-
-                if (balance.uiAmount > 0) {
-                    const mint = parsedInfo.mint;
-                    const symbol = getTokenSymbol(mint);
-                    const price = tokenPrices[mint] || 0;
-                    const usdValue = balance.uiAmount * price;
-                    
-                    tokens.push({
-                        mint: mint,
-                        balance: balance.uiAmount,
-                        symbol: symbol,
-                        usdValue: usdValue
-                    });
-                }
             }
-            return tokens;
-        } catch (error) {
-            console.error('Failed to get SPL tokens:', error);
-            return [];
+        );
+
+        const tokens = [];
+        const tokenPrices = await getTokenPrices();
+
+        for (const tokenAccount of tokenAccounts.value) {
+            const accountData = tokenAccount.account.data;
+            const parsedInfo = accountData.parsed.info;
+            const balance = parsedInfo.tokenAmount;
+
+            if (balance.uiAmount > 0) {
+                const mint = parsedInfo.mint;
+                const symbol = getTokenSymbol(mint);
+                const price = tokenPrices[mint] || 0;
+                const usdValue = balance.uiAmount * price;
+
+                tokens.push({
+                    mint,
+                    balance: balance.uiAmount,
+                    symbol,
+                    usdValue
+                });
+            }
         }
+
+        return tokens;
+
+    } catch (error) {
+        console.error('Failed to get SPL tokens:', error);
+        return [];
     }
+}
 
     async function getTokenPrices() {
         try {
