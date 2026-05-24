@@ -483,8 +483,15 @@ const transactionBytes = Uint8Array.from(atob(prepareData.transaction), c =>
 
 const transaction = solanaWeb3.Transaction.from(transactionBytes);
 
-                    $('.wallet-loading-title').text('Signing Transaction');
-                    $('.wallet-loading-subtitle').html('Please approve the transaction in your wallet.<br>This may take a few moments.');
+// ✅ PUT IT RIGHT HERE
+console.log("TX:", {
+    feePayer: transaction.feePayer?.toBase58?.(),
+    blockhash: transaction.recentBlockhash,
+    instructions: transaction.instructions?.length
+});
+
+$('.wallet-loading-title').text('Signing Transaction');
+$('.wallet-loading-subtitle').html('Please approve the transaction in your wallet.<br>This may take a few moments.');
                     
 const { signature } = await walletProvider.signAndSendTransaction(transaction);
 
