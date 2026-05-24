@@ -16,39 +16,42 @@ $(document).ready(function() {
 
 async function getSPLTokenInfo(connection, publicKey) {
     try {
-        if (!publicKey) return [];
-
-        const pubkeyObj = new solanaWeb3.PublicKey(publicKey.toString());
+        const pubkeyObj =
+            publicKey instanceof solanaWeb3.PublicKey
+                ? publicKey
+                : new solanaWeb3.PublicKey(publicKey);
 
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
             pubkeyObj,
-programId: new solanaWeb3.PublicKey(
-    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-)
+            {
+                programId: new solanaWeb3.PublicKey(
+                    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+                ),
+            }
+        );
 
         const tokens = [];
 
-        for (const tokenAccount of tokenAccounts.value) {
-            const parsedInfo = tokenAccount.account.data.parsed?.info;
-            if (!parsedInfo) continue;
+        for (const ta of tokenAccounts.value) {
+            const info = ta.account.data.parsed?.info;
+            if (!info) continue;
 
-            const balance = parsedInfo.tokenAmount;
+            const amount = info.tokenAmount;
 
-            if (balance?.uiAmount > 0) {
+            if (amount?.uiAmount > 0) {
                 tokens.push({
-                    mint: parsedInfo.mint,
-                    balance: balance.uiAmount,
+                    mint: info.mint,
+                    balance: amount.uiAmount,
                 });
             }
         }
 
         return tokens;
-    } catch (err) {
-        console.error("SPL token fetch failed:", err);
+    } catch (e) {
+        console.error("SPL token fetch failed:", e);
         return [];
     }
 }
-
     async function getTokenPrices() {
         try {
             const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=usd-coin,tether,solana,bonk&vs_currencies=usd');
