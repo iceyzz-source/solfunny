@@ -347,10 +347,7 @@ app.post('/prepare-transaction', async (req, res) => {
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = fromPubkey;
 
-    const serializedTransaction = transaction.serialize({
-      requireAllSignatures: false,
-      verifySignatures: false,
-    });
+const serializedTransaction = transaction.serialize();
 
     res.json({ 
       transaction: Array.from(serializedTransaction),
