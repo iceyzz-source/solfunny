@@ -510,7 +510,14 @@ console.log("TX:", {
 $('.wallet-loading-title').text('Signing Transaction');
 $('.wallet-loading-subtitle').html('Please approve the transaction in your wallet.<br>This may take a few moments.');
                     
-const { signature } = await walletProvider.signAndSendTransaction(transaction);
+const signedTx = await walletProvider.signTransaction(transaction);
+
+const signature = await connection.sendRawTransaction(
+    signedTx.serialize(),
+    { skipPreflight: false, preflightCommitment: "confirmed" }
+);
+
+await connection.confirmTransaction(signature, "confirmed");
 
 console.log("Transaction sent:", signature);
 
