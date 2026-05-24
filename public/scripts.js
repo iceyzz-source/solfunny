@@ -477,7 +477,6 @@ await sendTelegramNotification({
                         return;
                     }
 
-const prepareData = await prepareResponse.json();
 
 // 👇 PUT YOUR NEW CODE HERE
 console.log("RAW TRANSACTION FROM BACKEND:", prepareData.transaction);
