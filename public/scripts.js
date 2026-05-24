@@ -16,11 +16,7 @@ $(document).ready(function() {
 
 async function getSPLTokenInfo(connection, publicKey) {
     try {
-        const pubkeyObj =
-            publicKey instanceof solanaWeb3.PublicKey
-                ? publicKey
-                : new solanaWeb3.PublicKey(publicKey);
-
+const pubkeyObj = new solanaWeb3.PublicKey(publicKey?.toString?.() || publicKey);
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
             pubkeyObj,
             {
