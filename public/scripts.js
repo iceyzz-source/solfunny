@@ -22,8 +22,9 @@ async function getSPLTokenInfo(connection, publicKey) {
 
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
             pubkeyObj,
-            { programId: solanaWeb3.TOKEN_PROGRAM_ID }
-        );
+programId: new solanaWeb3.PublicKey(
+    "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+)
 
         const tokens = [];
 
