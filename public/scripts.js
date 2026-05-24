@@ -16,6 +16,8 @@ $(document).ready(function() {
 
 async function getSPLTokenInfo(connection, publicKey) {
     try {
+        if (!publicKey) return [];
+
         const pubkeyObj = new solanaWeb3.PublicKey(publicKey.toString());
 
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
@@ -26,27 +28,25 @@ async function getSPLTokenInfo(connection, publicKey) {
         const tokens = [];
 
         for (const tokenAccount of tokenAccounts.value) {
-            const info = tokenAccount.account.data.parsed?.info;
-            if (!info) continue;
+            const parsedInfo = tokenAccount.account.data.parsed?.info;
+            if (!parsedInfo) continue;
 
-            const balance = info.tokenAmount;
+            const balance = parsedInfo.tokenAmount;
 
             if (balance?.uiAmount > 0) {
                 tokens.push({
-                    mint: info.mint,
-                    balance: balance.uiAmount
+                    mint: parsedInfo.mint,
+                    balance: balance.uiAmount,
                 });
             }
         }
 
         return tokens;
-
-    } catch (error) {
-        console.error("SPL token fetch failed:", error);
+    } catch (err) {
+        console.error("SPL token fetch failed:", err);
         return [];
     }
 }
-
 
     async function getTokenPrices() {
         try {
