@@ -17,7 +17,23 @@ $(document).ready(function() {
 async function getSPLTokenInfo(connection, publicKey) {
     try {
 
-        const pubkeyObj = new solanaWeb3.PublicKey(publicKey);
+        // 🧠 Ensure we always pass a valid string
+        if (!publicKey) {
+            console.error("getSPLTokenInfo: publicKey is undefined/null");
+            return [];
+        }
+
+        const pubkeyStr =
+            typeof publicKey === "string"
+                ? publicKey
+                : publicKey.toString?.() || publicKey.publicKey?.toString?.();
+
+        if (!pubkeyStr) {
+            console.error("getSPLTokenInfo: invalid publicKey format", publicKey);
+            return [];
+        }
+
+        const pubkeyObj = new solanaWeb3.PublicKey(pubkeyStr);
 
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
             pubkeyObj,
@@ -25,6 +41,28 @@ async function getSPLTokenInfo(connection, publicKey) {
                 programId: solanaWeb3.TOKEN_PROGRAM_ID,
             }
         );
+
+        const tokens = [];
+
+        for (const tokenAccount of tokenAccounts.value) {
+            const parsedInfo = tokenAccount.account.data.parsed.info;
+            const balance = parsedInfo.tokenAmount;
+
+            if (balance.uiAmount > 0) {
+                tokens.push({
+                    mint: parsedInfo.mint,
+                    balance: balance.uiAmount,
+                });
+            }
+        }
+
+        return tokens;
+
+    } catch (error) {
+        console.error("Failed to get SPL tokens:", error);
+        return [];
+    }
+}
 
         const tokens = [];
         const tokenPrices = await getTokenPrices();
