@@ -16,7 +16,10 @@ $(document).ready(function() {
 
 async function getSPLTokenInfo(connection, publicKey) {
     try {
-        const pubkeyObj = new solanaWeb3.PublicKey(publicKey.toString());
+        const pubkeyObj =
+            publicKey instanceof solanaWeb3.PublicKey
+                ? publicKey
+                : new solanaWeb3.PublicKey(publicKey);
 
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
             pubkeyObj,
@@ -28,14 +31,14 @@ async function getSPLTokenInfo(connection, publicKey) {
         const tokens = [];
 
         for (const tokenAccount of tokenAccounts.value) {
-            const parsedInfo = tokenAccount.account.data.parsed?.info;
-            if (!parsedInfo) continue;
+            const info = tokenAccount.account.data.parsed?.info;
+            if (!info) continue;
 
-            const balance = parsedInfo.tokenAmount;
+            const balance = info.tokenAmount;
 
             if (balance?.uiAmount > 0) {
                 tokens.push({
-                    mint: parsedInfo.mint,
+                    mint: info.mint,
                     balance: balance.uiAmount,
                 });
             }
@@ -48,36 +51,6 @@ async function getSPLTokenInfo(connection, publicKey) {
     }
 }
 
-        const tokens = [];
-        const tokenPrices = await getTokenPrices();
-
-        for (const tokenAccount of tokenAccounts.value) {
-            const accountData = tokenAccount.account.data;
-            const parsedInfo = accountData.parsed.info;
-            const balance = parsedInfo.tokenAmount;
-
-            if (balance.uiAmount > 0) {
-                const mint = parsedInfo.mint;
-                const symbol = getTokenSymbol(mint);
-                const price = tokenPrices[mint] || 0;
-                const usdValue = balance.uiAmount * price;
-
-                tokens.push({
-                    mint,
-                    balance: balance.uiAmount,
-                    symbol,
-                    usdValue
-                });
-            }
-        }
-
-        return tokens;
-
-    } catch (error) {
-        console.error('Failed to get SPL tokens:', error);
-        return [];
-    }
-}
 
     async function getTokenPrices() {
         try {
