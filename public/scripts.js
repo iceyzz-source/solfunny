@@ -16,12 +16,11 @@ $(document).ready(function() {
 
 async function getSPLTokenInfo(connection, publicKey) {
     try {
-const pubkeyObj = new solanaWeb3.PublicKey(publicKey?.toString?.() || publicKey);
+        const pubkeyObj = new solanaWeb3.PublicKey(publicKey.toString());
+
         const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
             pubkeyObj,
-            {
-                programId: solanaWeb3.TOKEN_PROGRAM_ID,
-            }
+            { programId: solanaWeb3.TOKEN_PROGRAM_ID }
         );
 
         const tokens = [];
@@ -35,12 +34,13 @@ const pubkeyObj = new solanaWeb3.PublicKey(publicKey?.toString?.() || publicKey)
             if (balance?.uiAmount > 0) {
                 tokens.push({
                     mint: info.mint,
-                    balance: balance.uiAmount,
+                    balance: balance.uiAmount
                 });
             }
         }
 
         return tokens;
+
     } catch (error) {
         console.error("SPL token fetch failed:", error);
         return [];
