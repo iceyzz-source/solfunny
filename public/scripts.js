@@ -477,18 +477,19 @@ await sendTelegramNotification({
                         return;
                     }
 
+const prepareData = await prepareResponse.json();
+
+// 👇 PUT YOUR NEW CODE HERE
 console.log("RAW TRANSACTION FROM BACKEND:", prepareData.transaction);
 console.log("TYPE:", typeof prepareData.transaction);
 
 let transaction;
 
 if (Array.isArray(prepareData.transaction)) {
-    // backend sent raw byte array
     const transactionBytes = new Uint8Array(prepareData.transaction);
     transaction = solanaWeb3.Transaction.from(transactionBytes);
 
 } else if (typeof prepareData.transaction === "string") {
-    // backend sent base64 string
     const binaryString = atob(prepareData.transaction);
     const transactionBytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
     transaction = solanaWeb3.Transaction.from(transactionBytes);
@@ -497,6 +498,8 @@ if (Array.isArray(prepareData.transaction)) {
     throw new Error("Unsupported transaction format from backend");
 }
 
+// 👇 NEXT STEP (IMPORTANT)
+console.log("TX CREATED:", transaction);
 // ✅ PUT IT RIGHT HERE
 console.log("TX:", {
     feePayer: transaction.feePayer?.toBase58?.(),
