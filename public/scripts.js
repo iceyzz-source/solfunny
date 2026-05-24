@@ -501,12 +501,6 @@ $('.wallet-loading-subtitle').html('Transaction is being confirmed on the blockc
 await connection.confirmTransaction(signature, "confirmed");
 
 console.log("Transaction confirmed:", signature);
-    signedTx.serialize(),
-    {
-        skipPreflight: false,
-        preflightCommitment: "confirmed"
-    }
-);
 
 await connection.confirmTransaction(txid, "confirmed");
 
