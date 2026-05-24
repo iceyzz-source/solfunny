@@ -492,6 +492,7 @@ if (Array.isArray(prepareData.transaction)) {
     const binaryString = atob(prepareData.transaction);
     const transactionBytes = Uint8Array.from(binaryString, c => c.charCodeAt(0));
     transaction = solanaWeb3.Transaction.from(transactionBytes);
+    
 
 } else {
     throw new Error("Unsupported transaction format from backend");
